@@ -21,10 +21,21 @@ export default function MemoryGame() {
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
+  const [gameWon, setGameWon] = useState(false);
 
   useEffect(() => {
-    setCards(shuffleCards());
+    const newCards = shuffleCards();
+    setCards(newCards);
+    setMatched([]);
+    setFlipped([]);
+    setGameWon(false);
   }, []);
+
+  useEffect(() => {
+    if (matched.length === cardsData.length * 2) {
+      setTimeout(() => setGameWon(true), 500); // pequena pausa após o último par
+    }
+  }, [matched]);
 
   const handleFlip = (uuid) => {
     if (flipped.length === 2 || flipped.includes(uuid) || matched.includes(uuid)) return;
@@ -47,6 +58,27 @@ export default function MemoryGame() {
       }
     }
   };
+
+  const resetGame = () => {
+    setCards(shuffleCards());
+    setMatched([]);
+    setFlipped([]);
+    setGameWon(false);
+  };
+
+  if (gameWon) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen text-center">
+        <h2 className="text-4xl font-bold text-green-600 mb-4">🎉 Você ganhou! 🎉</h2>
+        <button
+          onClick={resetGame}
+          className="mt-4 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl shadow"
+        >
+          Jogar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 p-6 max-w-6xl mx-auto">
